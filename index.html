@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CaptionStudio — Create. Caption. Inspire.</title>
+  <meta name="description"
+    content="Turn your subtitles into stunning caption videos with custom typography, styles, animations, and audio — 100% in your browser.">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            app: '#070913',
+            card: '#0f1527',
+            cardSubtle: '#141b31',
+            inputBg: '#0b0f1e',
+            brandPurple: '#6366f1',
+            brandPink: '#ec4899',
+            brandBlue: '#3b82f6'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts: Base Families -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Bebas+Neue&family=Hind:wght@400;600;700&family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;700;900&family=Mukta:wght@400;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700;800&family=Noto+Serif+Devanagari:wght@400;700&family=Oswald:wght@500;700&family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Poppins:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body
+  class="bg-slate-100 dark:bg-[#070913] text-slate-800 dark:text-slate-100 min-h-screen flex flex-col selection:bg-purple-500 selection:text-white transition-colors duration-200">
+
+  <!-- ==========================================================
+       LOGIN & AUTHENTICATION SCREEN (SECURE ACCESS GATE)
+       ========================================================== -->
+  <div id="loginScreenContainer" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-100 dark:bg-[#070913] text-slate-800 dark:text-slate-100 p-4 sm:p-6 overflow-y-auto transition-colors duration-200">
+    
+    <!-- Top-Right Theme Toggle on Login Screen -->
+    <button id="loginThemeToggleBtn" class="absolute top-4 right-4 sm:top-6 sm:right-6 theme-toggle-btn shadow-md bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 z-20" title="Toggle Light / Dark Mode">
+      <span class="login-theme-icon-sun text-sm">☀️</span>
+      <span class="login-theme-icon-moon hidden text-sm">🌙</span>
+    </button>
+
+    <!-- Animated Ambient Gradient Background Orbs -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute -top-32 -left-32 w-96 h-96 bg-purple-500/15 dark:bg-purple-600/30 rounded-full blur-[128px] animate-pulse"></div>
+      <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-pink-500/15 dark:bg-pink-600/25 rounded-full blur-[128px] animate-pulse" style="animation-delay: 2s;"></div>
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/10 dark:bg-indigo-600/15 rounded-full blur-[140px] pointer-events-none"></div>
+    </div>
+
+    <!-- Login Card -->
+    <div class="relative w-full max-w-md bg-white/95 dark:bg-[#0f1426]/95 backdrop-blur-2xl border border-slate-200 dark:border-white/10 rounded-3xl p-6 sm:p-9 shadow-2xl shadow-purple-900/10 dark:shadow-purple-950/40 flex flex-col gap-5 sm:gap-6 z-10 transition-all">
+      
+      <!-- Logo & Heading -->
+      <div class="flex flex-col items-center text-center gap-2">
+        <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center shadow-xl shadow-purple-600/30 mb-1">
+          <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white fill-current" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </div>
+        <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-300 text-[11px] font-bold">
+          <span>🔒</span> <span>SECURE WORKSPACE</span>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">Sign In to CaptionStudio</h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400">Enter your authorized credentials to access the 2026 AI Studio.</p>
+      </div>
+
+      <!-- Error / Feedback Alert Banner -->
+      <div id="loginErrorMessage" class="hidden p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-xs font-medium flex items-center gap-2 animate-shake">
+        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span id="loginErrorText">Invalid Credentials</span>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" class="flex flex-col gap-4">
+        <!-- User ID -->
+        <div class="flex flex-col gap-1.5">
+          <label for="loginUserIdInput" class="text-xs font-bold text-slate-700 dark:text-slate-300">
+            User ID
+          </label>
+          <div class="relative flex items-center">
+            <span class="absolute left-3.5 text-slate-400 dark:text-slate-500 text-sm">👤</span>
+            <input 
+              type="text" 
+              id="loginUserIdInput" 
+              required
+              autocomplete="username"
+              placeholder="Enter User ID..."
+              class="w-full bg-slate-50 dark:bg-[#070914] border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl pl-10 pr-3.5 py-3 text-xs outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition shadow-inner font-medium placeholder-slate-400 dark:placeholder-slate-500">
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="flex flex-col gap-1.5">
+          <label for="loginPasswordInput" class="text-xs font-bold text-slate-700 dark:text-slate-300">
+            Password
+          </label>
+          <div class="relative flex items-center">
+            <span class="absolute left-3.5 text-slate-400 dark:text-slate-500 text-sm">🔑</span>
+            <input 
+              type="password" 
+              id="loginPasswordInput" 
+              required
+              autocomplete="current-password"
+              placeholder="••••••••••••"
+              class="w-full bg-slate-50 dark:bg-[#070914] border border-slate-300 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-xl pl-10 pr-10 py-3 text-xs outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition shadow-inner font-medium placeholder-slate-400 dark:placeholder-slate-500">
+            <button 
+              type="button" 
+              id="togglePasswordVisibilityBtn" 
+              class="absolute right-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-sm p-1 transition"
+              title="Show / Hide Password">
+              <span id="eyeIconOpen">👁️</span>
+              <span id="eyeIconClosed" class="hidden">🙈</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Remember Me Checkbox -->
+        <div class="flex items-center justify-between pt-1">
+          <label class="flex items-center gap-2 cursor-pointer select-none">
+            <input type="checkbox" id="rememberMeCheckbox" class="w-4 h-4 rounded text-purple-600 focus:ring-purple-500 focus:ring-offset-0 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900">
+            <span class="text-xs font-medium text-slate-600 dark:text-slate-400">Remember me</span>
+          </label>
+        </div>
+
+        <!-- Submit Button -->
+        <button 
+          type="submit" 
+          id="btnLoginSubmit"
+          class="w-full py-3.5 rounded-xl gradient-btn text-white text-xs font-extrabold shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2 mt-2 transition transform active:scale-98 cursor-pointer">
+          <span id="loginBtnText">Sign In & Unlock Studio</span>
+          <span id="loginBtnSpinner" class="hidden animate-spin">⚡</span>
+        </button>
+      </form>
+
+      <!-- Security Footnote -->
+      <div class="pt-2 border-t border-slate-200 dark:border-slate-800/80 flex flex-col gap-1 text-center text-[10px] text-slate-400 dark:text-slate-500">
+        <p>🔒 256-bit Encrypted Session Cookie Protection • Authorized Access Only</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==========================================================
+       AUTHENTICATED APPLICATION ROOT CONTAINER
+       ========================================================== -->
+  <div id="appRootContainer" class="hidden flex-1 flex flex-col min-h-screen">
+
+    <!-- Top Studio Header -->
+    <header
+      class="h-14 sm:h-16 border-b border-slate-200 dark:border-white/10 bg-white/95 dark:bg-[#0b0f1d]/90 backdrop-blur-md sticky top-0 z-50 flex items-center justify-between px-2.5 sm:px-6 shadow-sm dark:shadow-none gap-1.5 sm:gap-4">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-2 sm:gap-3 cursor-pointer shrink-0" id="navBrandBtn">
+        <div
+          class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center shadow-md sm:shadow-lg shadow-purple-500/30 shrink-0">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white fill-current" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </div>
+        <div>
+          <h1
+            class="text-sm sm:text-base font-extrabold tracking-tight bg-gradient-to-r from-purple-700 via-indigo-600 to-pink-600 dark:from-white dark:via-slate-100 dark:to-purple-300 bg-clip-text text-transparent leading-none">
+            CaptionStudio
+          </h1>
+          <p class="hidden sm:block text-[9px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">Create. Caption. Inspire.</p>
+        </div>
+      </div>
+
+      <!-- Interactive 4-Step Stepper (Responsive on Mobile) -->
+      <div
+        class="flex items-center gap-1 sm:gap-2.5 bg-slate-100/90 dark:bg-[#080c18]/80 border border-slate-200 dark:border-white/10 rounded-full px-1.5 sm:px-3.5 py-1 text-xs shrink min-w-0">
+        <div class="step-item active" data-step="1" id="stepIndicator1" title="Step 1: Upload">
+          <span class="step-badge">1</span>
+          <span class="hidden md:inline">Upload</span>
+        </div>
+        <span class="text-slate-400 dark:text-slate-600 text-[10px] hidden md:inline">→</span>
+        <div class="step-item" data-step="2" id="stepIndicator2" title="Step 2: Style">
+          <span class="step-badge">2</span>
+          <span class="hidden md:inline">Style</span>
+        </div>
+        <span class="text-slate-400 dark:text-slate-600 text-[10px] hidden md:inline">→</span>
+        <div class="step-item" data-step="3" id="stepIndicator3" title="Step 3: Edit & Timeline">
+          <span class="step-badge">3</span>
+          <span class="hidden md:inline">Timeline</span>
+        </div>
+        <span class="text-slate-400 dark:text-slate-600 text-[10px] hidden md:inline">→</span>
+        <div class="step-item" data-step="4" id="stepIndicator4" title="Step 4: Export">
+          <span class="step-badge">4</span>
+          <span class="hidden md:inline">Export</span>
+        </div>
+      </div>
+
+      <!-- Header Right: User Profile Badge, Theme Toggle & Logout -->
+      <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
+        <!-- Active User Profile Pill (Visible on md+) -->
+        <div class="hidden lg:flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 text-xs">
+          <div class="w-5 h-5 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center text-white text-[9px] font-bold shadow-sm">
+            S
+          </div>
+          <div class="flex flex-col text-left">
+            <span class="font-bold text-[10px] text-slate-800 dark:text-slate-200 leading-tight">Shubham</span>
+            <span class="text-[8px] text-purple-600 dark:text-purple-400 font-semibold">Pro Creator</span>
+          </div>
+        </div>
+
+        <!-- Theme Toggle -->
+        <button id="themeToggleBtn" class="theme-toggle-btn w-8 h-8 sm:w-9 sm:h-9" title="Toggle Light / Dark Mode">
+          <span id="themeIconSun" class="text-xs sm:text-sm">☀️</span>
+          <span id="themeIconMoon" class="hidden text-xs sm:text-sm">🌙</span>
+        </button>
+
+        <!-- Logout Button -->
+        <button 
+          id="btnLogoutBtn" 
+          class="px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/20 text-xs font-bold transition flex items-center gap-1 shadow-sm"
+          title="Sign Out of CaptionStudio">
+          <span class="text-xs">🚪</span>
+          <span class="hidden sm:inline">Logout</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Studio Main Viewport -->
+    <main
+      class="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#070913] flex flex-col p-4 sm:p-6 transition-colors duration-200"
+      id="mainAppContainer">
+
+    <!-- ==========================================================
+         STEP 1: UPLOAD SUBTITLE & AUDIO
+         ========================================================== -->
+    <section id="viewUpload" class="flex flex-col gap-6 max-w-7xl mx-auto w-full">
+      <!-- Title & Mode Selector -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+          <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white">Upload Your Subtitle & Media</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Select or drop your SRT/VTT file and optional background video / audio.</p>
+        </div>
+
+        <!-- Mode Switcher: Solid Canvas vs Background Video -->
+        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-slate-200/80 dark:bg-[#0f1527] border border-slate-300 dark:border-white/10 text-xs">
+          <button type="button" id="mediaModeCanvasBtn" class="media-mode-btn active px-3.5 py-1.5 rounded-lg font-bold transition bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow">
+            <span>🎨 Solid Canvas</span>
+          </button>
+          <button type="button" id="mediaModeVideoBtn" class="media-mode-btn px-3.5 py-1.5 rounded-lg font-semibold transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+            <span>🎬 Background Video</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Upload Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- LEFT 8 COLS: Subtitle, Video & Audio Upload Boxes + Live Subtitle Cues Table -->
+        <div class="lg:col-span-8 flex flex-col gap-6">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="uploadCardsGrid">
+            <!-- 1. Upload Subtitle File Card (Required) -->
+            <div class="studio-card p-5 flex flex-col justify-between" id="subtitleDropZone">
+              <div>
+                <div class="flex items-center gap-2 mb-3">
+                  <span class="w-6 h-6 rounded-full bg-purple-600 text-white text-xs font-bold flex items-center justify-center">1</span>
+                  <div>
+                    <h4 class="text-xs font-bold text-slate-900 dark:text-white">Subtitle File <span class="text-purple-600 dark:text-purple-400 font-semibold">(Required)</span></h4>
+                    <p class="text-[10px] text-slate-500 dark:text-slate-400">SRT or VTT format</p>
+                  </div>
+                </div>
+
+                <!-- Drop area -->
+                <div class="border-2 border-dashed border-purple-400/60 dark:border-purple-500/40 hover:border-purple-500 rounded-xl p-6 text-center flex flex-col items-center justify-center bg-purple-50/40 dark:bg-[#090d1c]/60 transition">
+                  <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                  </div>
+                  <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">Drag & drop your SRT or VTT file here</span>
+                  <span class="text-[10px] text-slate-500 mb-3">or click to browse</span>
+                  <label class="cursor-pointer px-4 py-2 rounded-xl gradient-btn text-white text-xs font-bold shadow-md">
+                    Choose Subtitle File
+                    <input type="file" id="step1SubtitleInput" accept=".srt,.vtt,.txt" class="hidden">
+                  </label>
+                </div>
+              </div>
+
+              <!-- Loaded File Badge -->
+              <div id="loadedSubtitleBadge" class="hidden mt-3 p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2 truncate">
+                  <span class="text-purple-600 dark:text-purple-400 font-bold">📄</span>
+                  <span id="loadedSubtitleName" class="text-slate-800 dark:text-slate-200 font-medium truncate">subtitles.srt</span>
+                  <span id="loadedSubtitleMeta" class="text-slate-500 dark:text-slate-400 text-[11px]">0 captions</span>
+                </div>
+                <span class="text-emerald-600 dark:text-emerald-400 text-[10px] font-semibold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 shrink-0">✓ Loaded</span>
+              </div>
+            </div>
+
+            <!-- 2. Background Video Card (Shown when Video Mode selected) -->
+            <div class="studio-card p-5 flex flex-col justify-between hidden" id="videoDropZoneCard">
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-full bg-pink-600 text-white text-xs font-bold flex items-center justify-center">2</span>
+                    <div>
+                      <h4 class="text-xs font-bold text-slate-900 dark:text-white">Background Video <span class="text-amber-500 font-semibold" id="videoRequiredBadge">(Required)</span></h4>
+                      <p class="text-[10px] text-slate-500 dark:text-slate-400">MP4, WebM or MOV format</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Video Drop area -->
+                <div class="border-2 border-dashed border-pink-400/60 dark:border-pink-500/40 hover:border-pink-500 rounded-xl p-6 text-center flex flex-col items-center justify-center bg-pink-50/40 dark:bg-[#090d1c]/60 transition" id="videoDropZone">
+                  <div class="w-10 h-10 rounded-full bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-400 flex items-center justify-center mb-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                  </div>
+                  <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">Drag & drop your video file here</span>
+                  <span class="text-[10px] text-slate-500 mb-3">or click to browse</span>
+                  <label class="cursor-pointer px-4 py-2 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 text-white text-xs font-bold shadow-md">
+                    Choose Video File
+                    <input type="file" id="step1VideoInput" accept="video/mp4,video/webm,video/quicktime,video/*" class="hidden">
+                  </label>
+                </div>
+              </div>
+
+              <!-- Loaded Video Badge -->
+              <div id="loadedVideoBadge" class="hidden mt-3 p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2 truncate">
+                  <span class="text-pink-600 dark:text-pink-400 font-bold">🎬</span>
+                  <span id="loadedVideoName" class="text-slate-800 dark:text-slate-200 font-medium truncate">video.mp4</span>
+                  <span id="loadedVideoMeta" class="text-slate-500 dark:text-slate-400 text-[11px]">00:00</span>
+                </div>
+                <span class="text-emerald-600 dark:text-emerald-400 text-[10px] font-semibold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 shrink-0">✓ Loaded</span>
+              </div>
+            </div>
+
+            <!-- 3. Add Background Music / Audio (Optional) Card -->
+            <div class="studio-card p-5 flex flex-col justify-between" id="audioUploadCard">
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">3</span>
+                    <div>
+                      <h4 class="text-xs font-bold text-slate-900 dark:text-white">Audio / Music <span class="text-slate-500 font-normal" id="audioOptionalBadge">(Optional - Off)</span></h4>
+                      <p class="text-[10px] text-slate-500 dark:text-slate-400" id="audioSubheadInfo">Background audio sync</p>
+                    </div>
+                  </div>
+                  <!-- Switch -->
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="step1AudioToggle">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <!-- Audio Drop Area -->
+                <div id="step1AudioControls" class="opacity-50 pointer-events-none transition-all flex flex-col gap-3">
+                  <div class="border-2 border-dashed border-blue-400/50 dark:border-blue-500/30 hover:border-blue-500 rounded-xl p-5 text-center flex flex-col items-center justify-center bg-blue-50/40 dark:bg-[#090d1c]/60" id="audioDropZone">
+                    <div class="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-1">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
+                    </div>
+                    <span class="text-xs text-slate-700 dark:text-slate-300">Drag & drop audio file here</span>
+                    <label class="cursor-pointer mt-2 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-medium border border-slate-300 dark:border-slate-700 shadow-sm transition">
+                      Choose Audio File
+                      <input type="file" id="step1AudioFileInput" accept=".mp3,.wav,.m4a,.aac,audio/*" class="hidden">
+                    </label>
+                  </div>
+
+                  <!-- Audio Metadata -->
+                  <div id="step1LoadedAudioBadge" class="hidden p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col gap-1 text-xs">
+                    <div class="flex items-center justify-between">
+                      <span id="step1AudioName" class="text-emerald-600 dark:text-emerald-400 font-medium truncate">✓ audio.mp3</span>
+                      <span id="step1AudioDur" class="text-purple-600 dark:text-purple-400 font-mono text-[10px]">00:00.000</span>
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] pt-1 border-t border-slate-200 dark:border-slate-800">
+                      <span class="text-slate-600 dark:text-slate-400">Volume: <b id="step1VolumeText" class="text-indigo-600 dark:text-indigo-400">100%</b></span>
+                      <input type="range" id="step1VolumeSlider" min="0" max="100" value="100" class="w-24">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subtitle Preview Table -->
+          <div class="studio-card p-5 flex flex-col gap-3">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-xs text-slate-800 dark:text-slate-200">Subtitle Cues</span>
+                <span id="previewTotalCount"
+                  class="text-[11px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">0
+                  captions</span>
+              </div>
+              <input type="text" id="filterSubtitleInput" placeholder="Filter captions..."
+                class="bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs rounded-lg px-2.5 py-1 w-44 outline-none focus:border-purple-500 placeholder-slate-400 dark:placeholder-slate-500">
+            </div>
+
+            <!-- Table -->
+            <div class="max-h-64 overflow-y-auto pr-1">
+              <table class="w-full text-left text-xs">
+                <thead
+                  class="text-[11px] text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-900/80 sticky top-0 border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th class="p-2 w-10">#</th>
+                    <th class="p-2 w-28">Start</th>
+                    <th class="p-2 w-28">End</th>
+                    <th class="p-2">Text</th>
+                  </tr>
+                </thead>
+                <tbody id="subtitleTableBody"
+                  class="divide-y divide-slate-200 dark:divide-slate-800/60 font-mono text-slate-700 dark:text-slate-300">
+                  <tr>
+                    <td colspan="4" class="p-8 text-center text-slate-400 font-sans text-xs" id="emptyTablePlaceholder">
+                      No subtitle file uploaded yet. Upload an SRT or VTT file above to get started.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT 4 COLS: Mini Preview & Project Settings -->
+        <div class="lg:col-span-4 flex flex-col gap-5">
+          <!-- Mini Preview Canvas with Video Playback Controls -->
+          <div class="studio-card p-4 flex flex-col gap-3">
+            <div class="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
+              <span class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Live Video Preview</span>
+              </span>
+              <button type="button"
+                class="btn-open-big-preview flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/25 text-indigo-600 dark:text-indigo-300 border border-indigo-500/30 transition shadow-sm cursor-pointer"
+                title="Open Fullscreen HD Video Preview Popup">
+                <span>🔍 1080p HD Preview ↗</span>
+              </button>
+            </div>
+
+            <div
+              class="canvas-wrapper aspect-video w-full flex items-center justify-center bg-black rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800">
+              <canvas id="step1MiniCanvas" width="1920" height="1080" class="max-w-full max-h-full"></canvas>
+            </div>
+
+            <!-- Step 1 Playback Bar & Scrubber -->
+            <div
+              class="flex flex-col gap-2 bg-slate-100 dark:bg-slate-900/90 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800">
+              <!-- Progress Scrubber -->
+              <input type="range" id="step1SeekSlider" min="0" max="100" value="0" step="0.1"
+                class="w-full h-1.5 cursor-pointer accent-purple-600 bg-slate-300 dark:bg-slate-700 rounded-lg">
+
+              <!-- Buttons & Time Display -->
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <button id="btnStep1PlayPause"
+                    class="w-7 h-7 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white flex items-center justify-center shadow hover:opacity-90 transition"
+                    title="Play / Pause Preview">
+                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </button>
+                  <button id="btnStep1JumpStart"
+                    class="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs"
+                    title="Jump to start">⏮</button>
+                  <div class="font-mono text-[11px]">
+                    <span id="step1CurrentTimeDisplay"
+                      class="text-purple-600 dark:text-purple-400 font-bold">00:00.000</span>
+                    <span class="text-slate-400 dark:text-slate-500">/</span>
+                    <span id="step1TotalDurationDisplay" class="text-slate-600 dark:text-slate-400">00:00.000</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M12 8v8m0 0l-3-3H6a1 1 0 01-1-1v-2a1 1 0 011-1h3l3-3z">
+                    </path>
+                  </svg>
+                  <input type="range" id="step1PreviewVolumeSlider" min="0" max="100" value="100"
+                    class="w-14 h-1 accent-purple-600">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video Settings -->
+          <div class="studio-card p-5 flex flex-col gap-4 text-xs">
+            <h4
+              class="font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-800 pb-2">
+              Video Settings
+            </h4>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-slate-500 dark:text-slate-400 mb-1">Resolution</label>
+                <select id="step1ResolutionSelect"
+                  class="w-full bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-lg p-2 focus:outline-none focus:border-purple-500 text-xs">
+                  <option value="16:9">1920 x 1080 (16:9)</option>
+                  <option value="9:16">1080 x 1920 (9:16 Shorts)</option>
+                  <option value="1:1">1080 x 1080 (1:1 Square)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-slate-500 dark:text-slate-400 mb-1">Frame Rate</label>
+                <select id="step1FpsSelect"
+                  class="w-full bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-lg p-2 focus:outline-none focus:border-purple-500 text-xs">
+                  <option value="24">24 FPS</option>
+                  <option value="30" selected>30 FPS</option>
+                  <option value="60">60 FPS</option>
+                </select>
+              </div>
+            </div>
+
+            <button id="btnNextToStyle"
+              class="w-full py-3 rounded-xl gradient-btn text-white text-xs font-bold shadow-xl flex items-center justify-center gap-2 mt-2">
+              <span>Next: Customize Style →</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================
+         STEP 2 & 3: STYLE, EDIT CAPTIONS & MULTI-TRACK TIMELINE
+         ========================================================== -->
+    <section id="viewEditor" class="hidden flex flex-col gap-4 max-w-7xl mx-auto w-full">
+      <!-- Title Bar -->
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">Studio Editor & <span
+              class="bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">Timeline</span>
+          </h2>
+        </div>
+        <div class="flex items-center gap-3">
+          <button
+            class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold border border-slate-300 dark:border-slate-700 shadow-sm transition"
+            id="btnBackToUpload">
+            ← Back to Upload
+          </button>
+          <button class="px-4 py-1.5 rounded-xl gradient-btn text-white text-xs font-bold shadow-lg"
+            id="btnNextToExport">
+            Next: Export Video →
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Workspace: Captions List | Video Canvas | Style Inspector -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+
+        <!-- LEFT 3 COLS: Captions Cue List Panel -->
+        <div class="lg:col-span-3 studio-card p-3 flex flex-col gap-3">
+          <div
+            class="flex items-center justify-between pb-1 border-b border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200">
+            <span>Captions (<span id="captionsCountLabel">0</span>)</span>
+            <button id="btnAddCaption"
+              class="px-2.5 py-1 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 rounded-lg text-[11px] font-semibold hover:bg-purple-200 transition">
+              + Add Cue
+            </button>
+          </div>
+
+          <!-- Search Cues -->
+          <input type="text" id="editorSearchCaptions" placeholder="Search captions..."
+            class="bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-xs rounded-lg p-2 outline-none focus:border-purple-500 placeholder-slate-400 dark:placeholder-slate-500">
+
+          <!-- Caption Cards List -->
+          <div id="captionListContainer" class="flex flex-col gap-2 max-h-[440px] overflow-y-auto pr-1"></div>
+        </div>
+
+        <!-- CENTER 6 COLS: Main 1080p Canvas & Playback Bar -->
+        <div class="lg:col-span-6 flex flex-col gap-3">
+          <div class="studio-card p-3 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-2 text-xs">
+              <select id="canvasAspectSelect"
+                class="bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-[11px] rounded-lg px-2 py-1 outline-none">
+                <option value="16:9">16:9 Landscape</option>
+                <option value="9:16">9:16 Shorts / Reels</option>
+                <option value="1:1">1:1 Square</option>
+              </select>
+              <button type="button"
+                class="btn-open-big-preview flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/25 text-indigo-600 dark:text-indigo-300 border border-indigo-500/30 transition shadow-sm cursor-pointer"
+                title="Open Fullscreen HD Video Preview Popup">
+                <span>🔍 1080p HD Preview ↗</span>
+              </button>
+            </div>
+
+            <!-- Main Canvas Viewport Wrapper -->
+            <div id="canvasWrapper" class="canvas-wrapper aspect-video w-full flex items-center justify-center p-2"
+              data-aspect="16-9">
+              <canvas id="previewCanvas" width="1920" height="1080"></canvas>
+            </div>
+
+            <!-- Playback Bar -->
+            <div
+              class="flex items-center justify-between gap-3 bg-slate-100 dark:bg-slate-900/90 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 mt-2">
+              <div class="flex items-center gap-2">
+                <button id="btnPlayPause"
+                  class="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white flex items-center justify-center shadow">
+                  <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </button>
+                <div class="font-mono text-xs">
+                  <span id="currentTimeDisplay" class="text-purple-600 dark:text-purple-400 font-bold">00:00.000</span>
+                  <span class="text-slate-400 dark:text-slate-500">/</span>
+                  <span id="totalDurationDisplay" class="text-slate-600 dark:text-slate-400">00:00.000</span>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M12 8v8m0 0l-3-3H6a1 1 0 01-1-1v-2a1 1 0 011-1h3l3-3z">
+                  </path>
+                </svg>
+                <input type="range" id="previewVolumeSlider" min="0" max="100" value="100" class="w-16">
+                <button id="btnJumpStart"
+                  class="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400"
+                  title="Jump to start">⏮</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT 3 COLS: Typography, Animation & Presets Inspector -->
+        <div class="lg:col-span-3 studio-card p-3 flex flex-col gap-3 text-xs">
+          <!-- Inspector Tabs -->
+          <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-900/90 p-1 rounded-xl border border-slate-200 dark:border-slate-800 text-[10px]">
+            <button class="flex-1 py-1 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold text-center" id="inspectorTabStyle">Style</button>
+            <button class="flex-1 py-1 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 text-center" id="inspectorTabPos">Position</button>
+            <button class="flex-1 py-1 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 text-center" id="inspectorTabBrand">Brand</button>
+            <button class="flex-1 py-1 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 text-center" id="inspectorTabAnim">Anim</button>
+            <button class="flex-1 py-1 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 text-center" id="inspectorTabPresets">Presets</button>
+          </div>
+
+          <!-- TAB 1: STYLE & VISUAL GOOGLE FONTS GALLERY -->
+          <div id="inspectorStylePanel" class="flex flex-col gap-3 max-h-[440px] overflow-y-auto pr-1">
+
+            <!-- Language Switcher: 2 Big Tabs -->
+            <div class="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs">
+              <button id="fontTabHindi" class="py-1.5 px-3 rounded-lg font-bold text-center flex items-center justify-center gap-1.5 transition active bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow">
+                <span>🇮🇳</span>
+                <span>हिंदी Fonts</span>
+              </button>
+              <button id="fontTabEnglish" class="py-1.5 px-3 rounded-lg font-bold text-center flex items-center justify-center gap-1.5 transition text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                <span>🔤</span>
+                <span>English Fonts</span>
+              </button>
+            </div>
+
+            <!-- Active Font Banner -->
+            <div class="p-2.5 rounded-xl bg-gradient-to-r from-purple-50 via-indigo-50 to-pink-50 dark:from-purple-950/40 dark:via-indigo-950/30 dark:to-slate-900 border border-purple-200 dark:border-purple-500/30 flex items-center justify-between">
+              <div class="flex flex-col">
+                <span class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Active Font</span>
+                <span id="activeFontNameDisplay" class="text-xs font-bold text-slate-900 dark:text-white">Noto Sans Devanagari</span>
+              </div>
+              <span id="fontPreviewSample" class="text-sm font-bold text-purple-700 dark:text-purple-300 truncate max-w-[140px]">Aa / आपका टेक्स्ट</span>
+            </div>
+
+            <!-- Quick Font Filter Search & Any Google Font Loader -->
+            <input type="text" id="fontSearchInput" placeholder="🔍 Search all Google Fonts or type any name..." class="w-full bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs rounded-lg px-2.5 py-1.5 outline-none focus:border-purple-500 placeholder-slate-400 dark:placeholder-slate-500 shadow-inner">
+
+            <!-- Infinite Scroll Visual Font Cards Gallery -->
+            <div class="relative flex flex-col gap-1">
+              <div id="fontCardGallery" class="flex flex-col gap-1.5 max-h-44 overflow-y-auto pr-1 border border-slate-200 dark:border-slate-800/80 rounded-xl p-1.5 bg-slate-50/50 dark:bg-slate-950/40"></div>
+              <div id="fontLoadingSpinner" class="hidden py-1 text-center text-[10px] text-purple-600 dark:text-purple-400 font-medium animate-pulse">
+                ✨ Loading more live Google Fonts...
+              </div>
+            </div>
+
+            <!-- Weight & Size -->
+            <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-200 dark:border-slate-800">
+              <div>
+                <label class="block text-slate-600 dark:text-slate-400 mb-1">Font Weight</label>
+                <select id="fontWeightSelect" class="w-full bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-lg p-1.5 focus:border-purple-500 focus:outline-none text-xs">
+                  <option value="400">Normal</option>
+                  <option value="600">Semi Bold</option>
+                  <option value="700" selected>Bold</option>
+                  <option value="800">Extra Bold</option>
+                </select>
+              </div>
+              <div>
+                <div class="flex justify-between text-slate-600 dark:text-slate-400 mb-1">
+                  <span>Font Size</span>
+                  <span id="fontSizeValue" class="text-purple-600 dark:text-purple-400 font-mono">68px</span>
+                </div>
+                <input type="range" id="fontSizeInput" min="20" max="150" value="68">
+              </div>
+            </div>
+
+            <!-- Colors -->
+            <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-200 dark:border-slate-800">
+              <div class="flex items-center justify-between bg-slate-100 dark:bg-slate-900/80 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
+                <span class="text-slate-700 dark:text-slate-300 text-[11px]">Text Color</span>
+                <input type="color" id="textColorInput" value="#FF0000">
+              </div>
+              <div class="flex items-center justify-between bg-slate-100 dark:bg-slate-900/80 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
+                <span class="text-slate-700 dark:text-slate-300 text-[11px]">Canvas BG</span>
+                <input type="color" id="canvasBgColorInput" value="#FFFFFF">
+              </div>
+            </div>
+
+            <!-- Stroke / Outline -->
+            <div class="pt-1 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-1.5">
+              <div class="flex items-center justify-between">
+                <span class="text-slate-700 dark:text-slate-300 font-medium">Text Stroke</span>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="enableStrokeToggle">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div id="strokeControlsSection" class="hidden flex items-center justify-between bg-slate-100 dark:bg-slate-900/60 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
+                <input type="color" id="strokeColorInput" value="#000000">
+                <span id="strokeWidthValue" class="text-slate-500 dark:text-slate-400 font-mono text-[11px]">4px</span>
+                <input type="range" id="strokeWidthInput" min="1" max="16" value="4" class="w-20">
+              </div>
+            </div>
+
+            <!-- Box Pill -->
+            <div class="pt-1 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-1.5">
+              <div class="flex items-center justify-between">
+                <span class="text-slate-700 dark:text-slate-300 font-medium">Caption Box / Pill</span>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="enableBoxToggle">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div id="boxControlsSection" class="hidden flex flex-col gap-2 bg-slate-100 dark:bg-slate-900/60 p-2.5 rounded-lg border border-slate-200 dark:border-slate-800">
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-600 dark:text-slate-400">Box Color</span>
+                  <input type="color" id="boxColorInput" value="#000000">
+                </div>
+                <div class="flex flex-col gap-1">
+                  <div class="flex justify-between text-[10px] text-slate-500 dark:text-slate-400">
+                    <span>Opacity</span>
+                    <span id="boxOpacityValue">80%</span>
+                  </div>
+                  <input type="range" id="boxOpacityInput" min="10" max="100" value="80">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: POSITION & PLACEMENT PANEL (9-Grid + Custom X/Y + Drag) -->
+          <div id="inspectorPosPanel" class="hidden flex flex-col gap-3.5 max-h-[440px] overflow-y-auto pr-1">
+            <div>
+              <label class="block text-slate-700 dark:text-slate-300 font-bold mb-1.5">Preset 9-Grid Position</label>
+              <div class="grid grid-cols-3 gap-1.5 bg-slate-100 dark:bg-slate-900/90 p-2 rounded-xl border border-slate-200 dark:border-slate-800">
+                <button type="button" class="btn-pos-preset py-1.5 px-1 rounded-lg text-[10px] font-semibold bg-white dark:bg-slate-800 hover:bg-purple-100 dark:hover:bg-purple-900/30 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition" data-pos="top-left">↖ Top Left</button>
+                <button type="button" class="btn-pos-preset py-1.5 px-1 rounded-lg text-[10px] font-semibold bg-white dark:bg-slate-800 hover:bg-purple-100 dark:hover:bg-purple-900/30 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition" data-pos="top-center">⬆ Top</button>
+                <button type="button" class="btn-pos-preset py-1.5 px-1 rounded-lg text-[10px] font-semibold bg-white dark:bg-slate-800 hover:bg-purple-100 dark:hover:bg-purple-900/30 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition" data-pos="top-right">↗ Top Right</button>
+
+                <button type="button" class="btn-pos-preset py-1.5 px-1 rounded-lg text-[10px] font-semibold bg-white dark:bg-slate-800 hover:bg-purple-100 dark:hover:bg-purple-900/30 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition" data-pos="mid-left">⬅ Mid Left</button>
+                <button type="button" class="btn-pos-preset py-1.5 px-1 rounded-lg text-[10px] font-semibold bg-white dark:bg-slate-800 hover:bg-purple-100 dark:hover:bg-purple-900/30 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition" data-pos="center">⏺ Center</button>
+                <button type="button" class="btn-pos-preset py-1.5 px-1 rounded-lg text-[10px] font-semibold bg-white dark:bg-slate-800 hover:bg-purple-100 dark:hover:bg-purple-900/30 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition" data-pos="mid-right">➡ Mid Right</button>
+
+                <button type="button" class="btn-pos-preset py-1.5 px-1 rounded-lg text-[10px] font-semibold bg-white dark:bg-slate-800 hover:bg-purple-100 dark:hover:bg-purple-900/30 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition" data-pos="bot-left">↙ Bot Left</button>
+                <button type="button" class="btn-pos-preset active py-1.5 px-1 rounded-lg text-[10px] font-semibold bg-purple-600 text-white shadow" data-pos="bot-center">⬇ Bottom</button>
+                <button type="button" class="btn-pos-preset py-1.5 px-1 rounded-lg text-[10px] font-semibold bg-white dark:bg-slate-800 hover:bg-purple-100 dark:hover:bg-purple-900/30 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition" data-pos="bot-right">↘ Bot Right</button>
+              </div>
+            </div>
+
+            <!-- Custom Exact Coordinates -->
+            <div class="pt-2 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-2.5">
+              <span class="text-[11px] font-bold text-slate-800 dark:text-slate-200">Custom Position & Dragging</span>
+              
+              <div>
+                <div class="flex justify-between text-slate-600 dark:text-slate-400 mb-1 text-[11px]">
+                  <span>Horizontal (X%)</span>
+                  <span id="customPosXValue" class="text-purple-600 dark:text-purple-400 font-mono">50%</span>
+                </div>
+                <input type="range" id="customPosXInput" min="5" max="95" value="50">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-slate-600 dark:text-slate-400 mb-1 text-[11px]">
+                  <span>Vertical (Y%)</span>
+                  <span id="customPosYValue" class="text-purple-600 dark:text-purple-400 font-mono">80%</span>
+                </div>
+                <input type="range" id="customPosYInput" min="5" max="95" value="80">
+              </div>
+            </div>
+
+            <div class="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-500/20 text-[10px] text-purple-700 dark:text-purple-300 flex items-center gap-2">
+              <span>💡</span>
+              <span>Click and drag directly on the video canvas to place captions anywhere!</span>
+            </div>
+          </div>
+
+          <!-- TAB 3: BRAND WATERMARK PANEL -->
+          <div id="inspectorBrandPanel" class="hidden flex flex-col gap-3.5 max-h-[440px] overflow-y-auto pr-1">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block">Brand Watermark</span>
+                <span class="text-[10px] text-slate-500">Show channel / page handle</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="enableWatermarkToggle">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div id="watermarkControlsSection" class="hidden flex flex-col gap-3 bg-slate-100 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
+              <div>
+                <label class="block text-slate-600 dark:text-slate-400 mb-1 text-[11px]">Watermark Text</label>
+                <input type="text" id="watermarkTextInput" value="@the hindi diary" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs rounded-lg p-2 outline-none focus:border-purple-500">
+              </div>
+
+              <div>
+                <label class="block text-slate-600 dark:text-slate-400 mb-1 text-[11px]">Position</label>
+                <select id="watermarkPosSelect" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-lg p-1.5 focus:border-purple-500 focus:outline-none text-xs">
+                  <option value="bottom-right" selected>Bottom Right</option>
+                  <option value="bottom-left">Bottom Left</option>
+                  <option value="top-right">Top Right</option>
+                  <option value="top-left">Top Left</option>
+                  <option value="bottom-center">Bottom Center</option>
+                </select>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <span class="text-[11px] text-slate-700 dark:text-slate-300">Color</span>
+                  <input type="color" id="watermarkColorInput" value="#FFFFFF">
+                </div>
+                <div>
+                  <div class="flex justify-between text-[10px] text-slate-500 dark:text-slate-400 mb-1">
+                    <span>Size</span>
+                    <span id="watermarkSizeValue">26px</span>
+                  </div>
+                  <input type="range" id="watermarkSizeInput" min="14" max="48" value="26">
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-[10px] text-slate-500 dark:text-slate-400 mb-1">
+                  <span>Opacity</span>
+                  <span id="watermarkOpacityValue">65%</span>
+                </div>
+                <input type="range" id="watermarkOpacityInput" min="10" max="100" value="65">
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 4: ANIMATION PANEL -->
+          <div id="inspectorAnimPanel" class="hidden flex flex-col gap-3">
+            <label class="text-slate-600 dark:text-slate-400 font-medium">Animation Style</label>
+            <select id="animationSelect" class="w-full bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-lg p-2 focus:border-purple-500 focus:outline-none">
+              <option value="none">None (Static)</option>
+              <option value="fade" selected>Smooth Fade In</option>
+              <option value="pop">Pop / Scale Spring</option>
+              <option value="slideUp">Slide Up</option>
+              <option value="typewriter">Typewriter</option>
+            </select>
+          </div>
+
+          <!-- TAB 5: PRESETS PANEL -->
+          <div id="inspectorPresetsPanel" class="hidden flex flex-col gap-3 max-h-[440px] overflow-y-auto pr-1">
+            <div class="flex items-center justify-between pb-1 border-b border-slate-200 dark:border-slate-800">
+              <span class="text-slate-800 dark:text-slate-300 font-bold text-xs flex items-center gap-1.5">
+                <span>🎨</span> <span>50+ Gen-Z & Hindi Presets</span>
+              </span>
+              <button id="btnSavePreset" class="px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-900/40 hover:bg-purple-200 dark:hover:bg-purple-900/60 text-[10px] text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-700 font-semibold transition">+ Save Custom</button>
+            </div>
+
+            <!-- Preset Category Filter Pills -->
+            <div class="flex items-center gap-1 overflow-x-auto pb-1 no-scrollbar text-[11px]" id="presetCategoryTabs">
+              <button class="preset-filter-btn active shrink-0 px-2.5 py-1 rounded-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-sm transition" data-category="all">✨ All (65+)</button>
+              <button class="preset-filter-btn shrink-0 px-2.5 py-1 rounded-lg font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition" data-category="instagram">📸 Instagram 2026 (12)</button>
+              <button class="preset-filter-btn shrink-0 px-2.5 py-1 rounded-lg font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition" data-category="hindi">🇮🇳 Hindi (15)</button>
+              <button class="preset-filter-btn shrink-0 px-2.5 py-1 rounded-lg font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition" data-category="viral">🔥 Viral Reels (10)</button>
+              <button class="preset-filter-btn shrink-0 px-2.5 py-1 rounded-lg font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition" data-category="genz">🌸 Gen-Z Aesthetic (12)</button>
+              <button class="preset-filter-btn shrink-0 px-2.5 py-1 rounded-lg font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition" data-category="cinema">🎬 Cinematic (8)</button>
+              <button class="preset-filter-btn shrink-0 px-2.5 py-1 rounded-lg font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition" data-category="minimal">💻 Minimal (8)</button>
+              <button class="preset-filter-btn shrink-0 px-2.5 py-1 rounded-lg font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition" data-category="custom">⭐ My Saved</button>
+            </div>
+
+            <!-- Search Presets Input --> 
+            <input type="text" id="presetSearchInput" placeholder="🔍 Search presets by style or font..." class="w-full bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs rounded-lg px-2.5 py-1.5 outline-none focus:border-purple-500 placeholder-slate-400 dark:placeholder-slate-500 shadow-inner">
+
+            <!-- Presets Cards Grid -->
+            <div id="presetCardsContainer" class="grid grid-cols-1 gap-2 max-h-[300px] overflow-y-auto pr-1"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM: Multi-Track Studio Timeline -->
+      <div class="studio-card p-4 flex flex-col gap-3">
+        <!-- Timeline Toolbar -->
+        <div class="flex items-center justify-between text-xs border-b border-slate-200 dark:border-slate-800 pb-2.5">
+          <div class="flex items-center gap-2">
+            <button
+              class="px-2.5 py-1 rounded-lg bg-purple-100 dark:bg-purple-600/30 hover:bg-purple-200 dark:hover:bg-purple-600/50 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-500/30 font-semibold"
+              id="tlAddCaptionBtn">+ Add Caption</button>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-slate-500 text-[11px]">Zoom:</span>
+            <input type="range" id="timelineZoomSlider" min="1" max="3" value="1" class="w-24">
+          </div>
+        </div>
+
+        <!-- Multi-Track Container -->
+        <div class="flex flex-col gap-1.5">
+          <!-- Timecode Ruler -->
+          <div class="timeline-ruler flex items-center justify-between px-3" id="mainTimelineRuler"></div>
+
+          <!-- Track 1: Captions Track -->
+          <div class="flex items-center gap-2">
+            <div class="w-20 shrink-0 text-slate-600 dark:text-slate-400 text-xs font-semibold flex items-center gap-1">
+              <span>T</span> <span>Captions</span>
+            </div>
+            <div
+              class="relative flex-1 h-12 bg-slate-100 dark:bg-slate-900/90 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-800 cursor-pointer"
+              id="timelineTrack">
+              <div id="timelineBlocks" class="absolute inset-0"></div>
+              <div id="timelinePlayhead" class="timeline-playhead" style="left: 0%;"></div>
+            </div>
+          </div>
+
+          <!-- Track 2: Video Filmstrip -->
+          <div class="flex items-center gap-2">
+            <div class="w-20 shrink-0 text-slate-600 dark:text-slate-400 text-xs font-semibold flex items-center gap-1">
+              <span>🎞</span> <span>Video</span>
+            </div>
+            <div
+              class="relative flex-1 h-9 bg-slate-200/80 dark:bg-slate-950 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-800 flex items-center">
+              <div
+                class="flex items-center w-full h-full opacity-80 dark:opacity-60 justify-between px-2 text-[10px] text-slate-600 dark:text-slate-500 font-mono">
+                <span>1080p HD Video Output</span>
+                <span>30 FPS Frame Pipeline</span>
+                <span>Deterministic Audio Sync</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Track 3: Audio Track -->
+          <div class="flex items-center gap-2" id="timelineAudioTrackRow">
+            <div class="w-20 shrink-0 text-slate-600 dark:text-slate-400 text-xs font-semibold flex items-center gap-1">
+              <span>🎵</span> <span>Audio</span>
+            </div>
+            <div
+              class="relative flex-1 h-9 bg-slate-100 dark:bg-slate-900 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-800 flex items-center px-2">
+              <canvas id="audioWaveformCanvas" class="waveform-canvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================
+         STEP 4: EXPORT CAPTION VIDEO
+         ========================================================== -->
+    <section id="viewExport" class="hidden flex flex-col gap-6 max-w-7xl mx-auto w-full">
+      <!-- Header -->
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white">Export Your <span
+              class="bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">Caption
+              Video</span></h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Review video settings and export your final MP4.</p>
+        </div>
+        <button
+          class="px-4 py-2 rounded-xl bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold border border-slate-300 dark:border-slate-700 shadow-sm transition"
+          id="btnExportBackToEdit">
+          ← Back to Editor
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- LEFT 7 COLS: Big 1080p Video Preview & Specs -->
+        <div class="lg:col-span-7 flex flex-col gap-4">
+          <div class="studio-card p-4 flex flex-col gap-3">
+            <div class="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
+              <span class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Final Video Preview</span>
+              </span>
+              <button type="button"
+                class="btn-open-big-preview flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/25 text-indigo-600 dark:text-indigo-300 border border-indigo-500/30 transition shadow-sm cursor-pointer"
+                title="Open Fullscreen HD Video Preview Popup">
+                <span>🔍 1080p HD Preview ↗</span>
+              </button>
+            </div>
+
+            <div
+              class="canvas-wrapper aspect-video w-full flex items-center justify-center bg-black rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800">
+              <canvas id="exportPreviewCanvas" width="1920" height="1080" class="max-w-full max-h-full"></canvas>
+            </div>
+
+            <!-- Export Step Playback Bar & Scrubber -->
+            <div
+              class="flex flex-col gap-2 bg-slate-100 dark:bg-slate-900/90 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800">
+              <!-- Progress Scrubber -->
+              <input type="range" id="exportSeekSlider" min="0" max="100" value="0" step="0.1"
+                class="w-full h-1.5 cursor-pointer accent-purple-600 bg-slate-300 dark:bg-slate-700 rounded-lg">
+
+              <!-- Buttons & Time Display -->
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <button id="btnExportPlayPause"
+                    class="w-7 h-7 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white flex items-center justify-center shadow hover:opacity-90 transition"
+                    title="Play / Pause Final Preview">
+                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </button>
+                  <button id="btnExportJumpStart"
+                    class="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs"
+                    title="Jump to start">⏮</button>
+                  <div class="font-mono text-[11px]">
+                    <span id="exportCurrentTimeDisplay"
+                      class="text-purple-600 dark:text-purple-400 font-bold">00:00.000</span>
+                    <span class="text-slate-400 dark:text-slate-500">/</span>
+                    <span id="exportTotalDurationDisplay" class="text-slate-600 dark:text-slate-400">00:00.000</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M12 8v8m0 0l-3-3H6a1 1 0 01-1-1v-2a1 1 0 011-1h3l3-3z">
+                    </path>
+                  </svg>
+                  <input type="range" id="exportPreviewVolumeSlider" min="0" max="100" value="100"
+                    class="w-14 h-1 accent-purple-600">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video Specs -->
+          <div class="studio-card p-4 flex flex-col gap-3">
+            <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200">Video Specs</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div
+                class="p-3 rounded-xl bg-slate-100 dark:bg-[#090d1c] border border-slate-200 dark:border-white/5 flex items-center gap-3">
+                <div
+                  class="w-9 h-9 rounded-lg bg-purple-100 dark:bg-purple-600/30 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold">
+                  📹</div>
+                <div>
+                  <span class="font-bold text-slate-900 dark:text-white block">Video</span>
+                  <span class="text-slate-500 dark:text-slate-400 text-[11px]">1080p HD • MP4 (H.264)</span>
+                </div>
+              </div>
+              <div
+                class="p-3 rounded-xl bg-slate-100 dark:bg-[#090d1c] border border-slate-200 dark:border-white/5 flex items-center gap-3">
+                <div
+                  class="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-600/30 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
+                  🎵</div>
+                <div>
+                  <span class="font-bold text-slate-900 dark:text-white block">Audio</span>
+                  <span class="text-slate-500 dark:text-slate-400 text-[11px]" id="exportAudioSummaryText">AAC Stereo
+                    (or Silent)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT 5 COLS: Export Settings & Action Button -->
+        <div class="lg:col-span-5 studio-card p-5 flex flex-col gap-5">
+          <h4
+            class="text-sm font-bold text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-slate-800 pb-3">
+            Export Settings
+          </h4>
+
+          <!-- Quality Profile -->
+          <div class="flex flex-col gap-2 text-xs">
+            <label class="text-slate-600 dark:text-slate-400 font-medium">Quality Profile</label>
+            <div class="grid grid-cols-3 gap-2">
+              <div class="quality-card text-center" data-quality="standard">
+                <span class="font-bold text-slate-800 dark:text-white block text-[11px]">Standard</span>
+                <span class="text-[10px] text-slate-500 dark:text-slate-400">1080p • 14 Mbps</span>
+              </div>
+              <div class="quality-card active text-center" data-quality="high">
+                <span class="font-bold text-purple-700 dark:text-purple-300 block text-[11px]">Ultra Crisp HD</span>
+                <span class="text-[10px] text-slate-500 dark:text-slate-400">24 Mbps • CRF 12</span>
+              </div>
+              <div class="quality-card text-center" data-quality="very-high">
+                <span class="font-bold text-slate-800 dark:text-white block text-[11px]">Studio Master</span>
+                <span class="text-[10px] text-slate-500 dark:text-slate-400">40 Mbps • Lossless</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- File Name -->
+          <div class="flex flex-col gap-1 text-xs">
+            <label class="block text-slate-600 dark:text-slate-400 font-medium">File Name</label>
+            <input type="text" id="exportFileNameInput" value="caption-video.mp4"
+              class="w-full bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-lg p-2 focus:border-purple-500 outline-none font-mono text-xs">
+          </div>
+
+          <!-- Big Main Export Button -->
+          <button id="btnExportVideoAction"
+            class="w-full py-3.5 rounded-xl gradient-btn text-white text-sm font-extrabold shadow-2xl flex items-center justify-center gap-2 mt-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            </svg>
+            <span>Export 1080p Video →</span>
+          </button>
+          <p class="text-[10px] text-slate-500 text-center">🔒 Client-side browser rendering. Files never leave your
+            machine.</p>
+        </div>
+      </div>
+    </section>
+
+    </main>
+  </div>
+
+  <!-- ==========================================================
+       HD THEATER / LARGE POPUP VIDEO PREVIEW MODAL
+       ========================================================== -->
+  <div id="bigPreviewModal"
+    class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-3 sm:p-6">
+    <div
+      class="studio-card max-w-5xl w-full p-4 sm:p-5 shadow-2xl flex flex-col gap-3 border border-purple-500/40 bg-white dark:bg-[#0c1022]">
+
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2.5">
+        <div class="flex items-center gap-2">
+          <div
+            class="w-7 h-7 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center text-white text-xs font-bold shadow">
+            📹
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <span>HD Video Theater Preview</span>
+              <span
+                class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-mono">1080p
+                Crystal Clear</span>
+            </h3>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Aspect Ratio Quick Switcher inside Modal -->
+          <select id="modalAspectSelect"
+            class="bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-[11px] rounded-lg px-2 py-1 outline-none">
+            <option value="16:9">16:9 Landscape</option>
+            <option value="9:16">9:16 Shorts / Reels</option>
+            <option value="1:1">1:1 Square</option>
+          </select>
+          <button id="btnCloseBigPreviewModal"
+            class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-sm flex items-center justify-center transition"
+            title="Close Preview">✕</button>
+        </div>
+      </div>
+
+      <!-- Large Canvas Video Viewport -->
+      <div id="modalCanvasWrapper"
+        class="canvas-wrapper w-full flex items-center justify-center bg-black rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 max-h-[62vh]"
+        style="aspect-ratio: 16/9;">
+        <canvas id="modalBigPreviewCanvas" width="1920" height="1080"
+          class="max-w-full max-h-[62vh] object-contain"></canvas>
+      </div>
+
+      <!-- Modal Full Playback Bar -->
+      <div
+        class="flex flex-col gap-2 bg-slate-100 dark:bg-slate-900/90 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
+        <!-- Progress Scrubber -->
+        <input type="range" id="modalSeekSlider" min="0" max="100" value="0" step="0.1"
+          class="w-full h-2 cursor-pointer accent-purple-600 bg-slate-300 dark:bg-slate-700 rounded-lg">
+
+        <!-- Controls Row: Play/Pause | Time | Volume -->
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <button id="btnModalPlayPause"
+              class="w-9 h-9 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white flex items-center justify-center shadow-lg hover:opacity-95 transition"
+              title="Play / Pause">
+              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </button>
+            <button id="btnModalJumpStart"
+              class="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 text-sm"
+              title="Jump to start">⏮</button>
+            <div class="font-mono text-xs">
+              <span id="modalCurrentTimeDisplay" class="text-purple-600 dark:text-purple-400 font-bold">00:00.000</span>
+              <span class="text-slate-400 dark:text-slate-500">/</span>
+              <span id="modalTotalDurationDisplay" class="text-slate-600 dark:text-slate-400">00:00.000</span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 text-slate-600 dark:text-slate-400 text-xs">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M12 8v8m0 0l-3-3H6a1 1 0 01-1-1v-2a1 1 0 011-1h3l3-3z">
+              </path>
+            </svg>
+            <span class="text-[11px] font-medium hidden sm:inline">Volume:</span>
+            <input type="range" id="modalPreviewVolumeSlider" min="0" max="100" value="100"
+              class="w-20 h-1.5 accent-purple-600">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================
+       EXPORT PROGRESS & RESULT MODAL
+       ========================================================== -->
+  <div id="exportModal"
+    class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="studio-card max-w-lg w-full p-6 shadow-2xl flex flex-col gap-5 border-purple-500/40">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-purple-500 animate-pulse"></span>
+          Exporting Caption Video
+        </h3>
+        <button id="btnCloseExportModal"
+          class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition p-1">✕</button>
+      </div>
+
+      <!-- Processing Progress State -->
+      <div id="exportProgressContainer" class="flex flex-col gap-4 py-4">
+        <div class="flex items-center justify-between text-xs">
+          <span id="exportStatusText" class="text-slate-700 dark:text-slate-300 font-medium">Preparing video...</span>
+          <span id="exportPercentText"
+            class="font-mono text-purple-600 dark:text-purple-400 font-bold text-sm">0%</span>
+        </div>
+        <div
+          class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-3 overflow-hidden p-0.5 border border-slate-300 dark:border-slate-700">
+          <div id="exportProgressBar" class="gradient-btn h-full rounded-full transition-all duration-200"
+            style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <!-- Success Result State -->
+      <div id="exportResultContainer" class="hidden flex flex-col gap-4">
+        <div
+          class="rounded-xl overflow-hidden bg-black border border-slate-200 dark:border-slate-800 aspect-video flex items-center justify-center">
+          <video id="exportResultVideo" controls class="max-w-full max-h-full"></video>
+        </div>
+        <button id="btnDownloadExport"
+          class="w-full py-3 rounded-xl gradient-btn text-white font-bold text-xs shadow-lg shadow-purple-500/30 transition flex items-center justify-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+          </svg>
+          <span>Download MP4 Video</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Popup -->
+  <div id="toastNotification"
+    class="fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-xl shadow-2xl text-xs font-medium hidden transition-all duration-300">
+  </div>
+
+  <!-- Core Scripts -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/font-manager.js"></script>
+  <script src="assets/js/parser.js"></script>
+  <script src="assets/js/style-manager.js"></script>
+  <script src="assets/js/preset-manager.js"></script>
+  <script src="assets/js/canvas-renderer.js"></script>
+  <script src="assets/js/timeline.js"></script>
+  <script src="assets/js/audio-manager.js"></script>
+  <script src="assets/js/exporter.js"></script>
+  <script src="assets/js/app.js"></script>
+
+</body>
+
+</html>
